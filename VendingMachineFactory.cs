@@ -28,13 +28,16 @@ namespace seng301_asgn1 {
     /// on typed collections: https://www.youtube.com/watch?v=WtpoaacjLtI -- if it does not
     /// make sense, you can look up "Generic Collection" tutorials for C#.
     /// </summary>
+  
     public class VendingMachineFactory : IVendingMachineFactory {
         public int vmIndex=-1;
         public List<String> popNames;
         public List<int> popCosts;
         public List<int> coinKinds;
+        public List<Pop> popLoads;
         public int selectionButtonCount;
-        public List<int> coins;
+        public int coinKindIndex;
+        public static int balance;
         public VendingMachineFactory() {
             // TODO: Implement
             
@@ -113,27 +116,85 @@ namespace seng301_asgn1 {
 
         public void loadCoins(int vmIndex, int coinKindIndex, List<Coin> coins) {
             // TODO: Implement
-            
-
+            //coins slots = coinkindindex 
+            //coins to be added is coins 
+            int coinKindsCount = 0;
+            this.coinKindIndex = coinKindIndex;
+            //how do i add coins to coins
+            foreach(int i in coinKinds)
+            {
+                coinKindsCount++;
+            }
+            if(coinKindIndex < 0 || coinKindIndex >= coinKindsCount || vmIndex > this.vmIndex)
+            {
+                throw new IndexOutOfRangeException();
+            }
 
         }
 
         public void loadPops(int vmIndex, int popKindIndex, List<Pop> pops) {
             // TODO: Implement
+            int popNamesCount = 0;
+            foreach(String i in popNames)
+            {
+                popNamesCount++;
+                //move pop names and costs to the list maybe change to hashmap?
+            }
+            if (popKindIndex < 0 || popKindIndex >= popNamesCount || vmIndex > this.vmIndex)
+            {
+                throw new IndexOutOfRangeException();
+            }
         }
 
         public void insertCoin(int vmIndex, Coin coin) {
             // TODO: Implement
-            
+            if(coinKinds.Contains(coin.Value()) == true)
+            {
+                balance = balance + coin.Value();
+            }
+            else if(coin.Value() < 0)
+            {
+                throw new Exception("Coin value less than one");
+            }
+            else if (coinKinds.Contains(coin.Value()) == false)
+            {
+                extractFromDeliveryChute(coin.Value());
+            }
+            if(vmIndex < 0 || vmIndex > this.vmIndex)
+            {
+                throw new IndexOutOfRangeException();
+            }
         }
 
         public void pressButton(int vmIndex, int value) {
             // TODO: Implement
+            if(balance >= popCosts.get(value))
+            {
+                popLoads.Remove(value);
+                int returnValueInChange = balance - popCosts.get(value);
+
+            }
+            else
+            {
+                popLoads.Remove(value);
+
+            }
+
+
+            if(vmIndex < 0 || vmIndex > this.vmIndex)
+            {
+                throw new IndexOutOfRangeException();
+            }
         }
 
         public List<Deliverable> extractFromDeliveryChute(int vmIndex) {
             // TODO: Implement
-            return new List<Deliverable>();
+            return new List<Deliverable>()
+            {
+                popLoads(),
+                coinKinds(),
+ //               revenue????;
+            };
         }
 
         public List<IList> unloadVendingMachine(int vmIndex) {
@@ -141,8 +202,12 @@ namespace seng301_asgn1 {
 
             popNames.Clear();
             popCosts.Clear();
-
+            popLoads.Clear();
             coinKinds.Clear();
+            if(vmIndex < 0 || vmIndex > this.vmIndex)
+            {
+                throw new IndexOutOfRangeException();
+            }
             return new List<IList>() {
                 new List<Coin>(),
                 new List<Coin>(),
