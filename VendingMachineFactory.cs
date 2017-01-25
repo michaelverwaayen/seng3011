@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System;
 using Frontend1;
 
-namespace seng301_asgn1 {
+namespace seng301_asgn1
+{
     /// <summary>
     /// Represents the concrete virtual vending machine factory that you will implement.
     /// This implements the IVendingMachineFactory interface, and so all the functions
@@ -28,190 +29,236 @@ namespace seng301_asgn1 {
     /// on typed collections: https://www.youtube.com/watch?v=WtpoaacjLtI -- if it does not
     /// make sense, you can look up "Generic Collection" tutorials for C#.
     /// </summary>
-  
-    public class VendingMachineFactory : IVendingMachineFactory {
-        public int vmIndex=-1;
+
+    public class VendingMachineFactory : IVendingMachineFactory
+    {
+        Dictionary<int, List<Pop>> popChute = new Dictionary<int, List<Pop>>();
+        Dictionary<int, List<Coin>> coinChute = new Dictionary<int, List<Coin>>();
         public List<String> popNames;
         public List<int> popCosts;
         public List<int> coinKinds;
         public List<Pop> popLoads;
+        public List<Coin> coinsPassedInForLoading;
+        public List<Pop> popsPassedInForLoading;
+        public List<Coin> coinLoads;
+        public List<Coin> phatStacks = new List<Coin>();
+        public List<Deliverable> extractionDeliveryItems = new List<Deliverable>();
+        public int vmIndex = -1;
         public int selectionButtonCount;
         public int coinKindIndex;
         public static int balance;
-        public VendingMachineFactory() {
+        public VendingMachineFactory()
+        {
             // TODO: Implement
-            
-
         }
 
-        public int createVendingMachine(List<int> coinKinds, int selectionButtonCount) {
+        public int createVendingMachine(List<int> coinKinds, int selectionButtonCount)
+        {
             // TODO: Implement
             vmIndex++;
             this.coinKinds = coinKinds;
             this.selectionButtonCount = selectionButtonCount;
             int previousCoin = 0;
-            if(selectionButtonCount <= 0)
+            if (selectionButtonCount <= 0)
             {
-                throw new Exception("This is not a valid number of buttons.");
+             //   throw new Exception("This is not a valid number of buttons.");
             }
             foreach (int i in coinKinds)
             {
                 //Coin(i);
-                if(i <= 0)
+                if (i <= 0)
                 {
-                    throw new Exception("This is not a valid coin.");
+                 //   throw new Exception("This is not a valid coin.");
                 }
-                if(previousCoin == i)
+                if (previousCoin == i)
                 {
-                    throw new Exception("All coins must be unique");
+                   // throw new Exception("All coins must be unique");
                 }
                 previousCoin = i;
             }
 
             return vmIndex;
         }
-        public void configureVendingMachine(int vmIndex, List<string> popNames, List<int> popCosts) {
+        public void configureVendingMachine(int vmIndex, List<string> popNames, List<int> popCosts)
+        {
             // TODO: Implement
             int countPopNames = 0;
             int countPopCosts = 0;
-            if(popNames == null || popCosts == null)
-            {
-                throw new Exception("A pop name or value are incorrect.");
-            }
-            if(vmIndex < 0 || this.vmIndex > vmIndex)
-            {
-                throw new Exception("There is no vending machine here.");
-            }
             this.popNames = popNames;
             this.popCosts = popCosts;
-            foreach(String i in popNames)
+            if (popNames == null || popCosts == null)
+            {
+               // throw new Exception("A pop name or value are incorrect.");
+            }
+            if (vmIndex < 0 || this.vmIndex > vmIndex)
+            {
+              //  throw new Exception("There is no vending machine here.");
+            }
+
+            foreach (String i in popNames)
             {
                 countPopNames++;
-                if(i == null || i == " ")
+                if (i == null || i == " ")
                 {
-                    throw new Exception("Invalid name for pop.");
+                  //  throw new Exception("Invalid name for pop.");
                 }
             }
-            foreach(int i in popCosts)
+            foreach (int i in popCosts)
             {
                 countPopCosts++;
-                if(i <= 0)
+                if (i <= 0)
                 {
-                    throw new Exception("Invalid pop cost.");
+                  //  throw new Exception("Invalid pop cost.");
                 }
             }
-            if(countPopCosts > countPopNames || countPopNames < countPopCosts)
+            if (countPopCosts > countPopNames || countPopNames < countPopCosts)
             {
-                throw new Exception("One list is greater than the other invalid!!");
+              //  throw new Exception("One list is greater than the other invalid!!");
             }
-            if(countPopCosts > selectionButtonCount)
+            if (countPopCosts > selectionButtonCount)
             {
-                throw new Exception("More costs than buttons!");
+             //   throw new Exception("More costs than buttons!");
             }
-            if(countPopNames > selectionButtonCount)
+            if (countPopNames > selectionButtonCount)
             {
-                throw new Exception("More drinks than buttons!");
-            }         
+               // throw new Exception("More drinks than buttons!");
+            }
         }
 
-        public void loadCoins(int vmIndex, int coinKindIndex, List<Coin> coins) {
+        public void loadCoins(int vmIndex, int coinKindIndex, List<Coin> coins)
+        {
             // TODO: Implement
-            //coins slots = coinkindindex 
-            //coins to be added is coins 
             int coinKindsCount = 0;
             this.coinKindIndex = coinKindIndex;
-            //how do i add coins to coins
-            foreach(int i in coinKinds)
+            this.coinsPassedInForLoading = coins;
+            coinLoads = new List<Coin>();
+            if(coinsPassedInForLoading.Count < 1)
+            {
+             //   throw new Exception("No coins");
+            }
+            foreach (Coin i in coinsPassedInForLoading)
             {
                 coinKindsCount++;
+                if (coinKinds.Contains(i.Value))
+                {
+                    coinLoads.Add(i);
+                }
             }
-            if(coinKindIndex < 0 || coinKindIndex >= coinKindsCount || vmIndex > this.vmIndex)
+            coinChute.Add(coinKindIndex, coinLoads);
+            if (coinKindIndex < 0 || coinKindIndex >= coinKindsCount || vmIndex > this.vmIndex)
             {
-                throw new IndexOutOfRangeException();
+              //  throw new Exception();
             }
-
         }
 
-        public void loadPops(int vmIndex, int popKindIndex, List<Pop> pops) {
+        public void loadPops(int vmIndex, int popKindIndex, List<Pop> pops)
+        {
             // TODO: Implement
             int popNamesCount = 0;
-            foreach(String i in popNames)
+            this.popsPassedInForLoading = pops;
+            popLoads = new List<Pop>();
+            foreach (Pop i in popsPassedInForLoading)
             {
                 popNamesCount++;
-                //move pop names and costs to the list maybe change to hashmap?
+                if (popNames.Contains(i.ToString()))
+                {
+                    popLoads.Add(i);
+                }
             }
+            popChute.Add(popKindIndex, popLoads);
             if (popKindIndex < 0 || popKindIndex >= popNamesCount || vmIndex > this.vmIndex)
             {
-                throw new IndexOutOfRangeException();
+             //   throw new Exception("Pop name or value is uneven");
             }
         }
 
-        public void insertCoin(int vmIndex, Coin coin) {
+        public void insertCoin(int vmIndex, Coin coin)
+        {
             // TODO: Implement
-            if(coinKinds.Contains(coin.Value()) == true)
+            if (coinKinds.Contains(coin.Value) == true)
             {
-                balance = balance + coin.Value();
+                balance = balance + coin.Value;
+                phatStacks.Add(coin);
             }
-            else if(coin.Value() < 0)
+            else if (coin.Value < 0)
             {
-                throw new Exception("Coin value less than one");
+            //    throw new Exception("Coin value less than one");
             }
-            else if (coinKinds.Contains(coin.Value()) == false)
+            else if (coinKinds.Contains(coin.Value) == false)
             {
-                extractFromDeliveryChute(coin.Value());
+                extractionDeliveryItems.Add(coin);
             }
-            if(vmIndex < 0 || vmIndex > this.vmIndex)
+            if (vmIndex < 0 || vmIndex > this.vmIndex)
             {
-                throw new IndexOutOfRangeException();
+             //   throw new Exception("Virtual machine does not exist");
             }
+            extractFromDeliveryChute(vmIndex);
         }
-
-        public void pressButton(int vmIndex, int value) {
+        public void pressButton(int vmIndex, int value)
+        {
             // TODO: Implement
-            if(balance >= popCosts.get(value))
-            {
-                popLoads.Remove(value);
-                int returnValueInChange = balance - popCosts.get(value);
 
+            if (balance >= popCosts[value])
+            {
+                //I need to use the hashmap to find if im adding it 
+                Pop popNameOrder = popChute[value][0];
+                int count = 1;
+                popChute[value].RemoveAt(0);
+                extractionDeliveryItems.Add(popNameOrder);
+                int returnValueInChange = balance - popCosts[value];
+                if (returnValueInChange > 0)
+                {
+                    /*
+                  while (returnValueInChange != 0)
+                  {
+                      List<Coin> coinsInTheChute = coinChute[coinChute.Count - count];
+                      /*
+                      while (returnValueInChange >= (coinsInTheChute[0].Value))
+                      {
+                          returnValueInChange =returnValueInChange - (coinsInTheChute[0].Value);
+                          extractionDeliveryItems.Add(coinsInTheChute[0]);
+                          extractFromDeliveryChute(vmIndex);
+                          phatStacks.Remove(coinsInTheChute[0]);
+                          coinsInTheChute.RemoveAt(0);
+                      }
+                      count++;
+                      
+                }
+                */
+                }
             }
             else
             {
-                popLoads.Remove(value);
-
+             //   Console.WriteLine("Not enough coins!!");
             }
-
-
-            if(vmIndex < 0 || vmIndex > this.vmIndex)
+            if (vmIndex < 0 || vmIndex > this.vmIndex)
             {
-                throw new IndexOutOfRangeException();
+            //    throw new Exception("Virtual machine does not exist");
             }
         }
 
-        public List<Deliverable> extractFromDeliveryChute(int vmIndex) {
+        public List<Deliverable> extractFromDeliveryChute(int vmIndex)
+        {
             // TODO: Implement
-            return new List<Deliverable>()
-            {
-                popLoads(),
-                coinKinds(),
- //               revenue????;
-            };
+            return new List<Deliverable>(extractionDeliveryItems);
         }
 
-        public List<IList> unloadVendingMachine(int vmIndex) {
+        public List<IList> unloadVendingMachine(int vmIndex)
+        {
             // TODO: Implement
 
             popNames.Clear();
             popCosts.Clear();
             popLoads.Clear();
             coinKinds.Clear();
-            if(vmIndex < 0 || vmIndex > this.vmIndex)
+            if (vmIndex < 0 || vmIndex > this.vmIndex)
             {
-                throw new IndexOutOfRangeException();
+             //   throw new Exception("virtual machine does not exist");
             }
             return new List<IList>() {
-                new List<Coin>(),
-                new List<Coin>(),
-                new List<Pop>() };
-            }
+                new List<Coin>(phatStacks),
+                new List<Coin>(coinChute[0]),
+                new List<Pop>(popChute[0]) };
+        }
     }
 }
