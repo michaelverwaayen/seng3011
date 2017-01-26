@@ -238,16 +238,17 @@ namespace seng301_asgn1
                     
                     foreach (Coin i in fullCoins)
                         {
-                        Console.WriteLine("IJ" + i);
                         if (i.Value <= returnValueInChange)
                         {                            
                             returnValueInChange = returnValueInChange - i.Value;
                             extractionDeliveryItems.Add(i);
+                            
                             Console.WriteLine(returnValueInChange);   
                                                      
                         }
                         if ((returnValueInChange == 0) || (sortedCoins[0] > returnValueInChange))
                         {
+                            Console.WriteLine(i);
                           //  Console.WriteLine(returnValueInChange);
                           //  Console.WriteLine("Im gey");
                             break;
@@ -274,7 +275,29 @@ namespace seng301_asgn1
         public List<IList> unloadVendingMachine(int vmIndex)
         {
             // TODO: Implement
-
+            int count = 0;
+            int counter = 0;
+            List<Coin> tearDownCoins = new List<Coin>();
+            List<Pop> tearDownPops = new List<Pop>();
+            while (count < coinChute.Count)
+            {
+                foreach (Coin i in coinChute[count])
+                {
+                    Console.WriteLine("COINS" + i);
+                   tearDownCoins.Add(i);
+                }
+                count++;
+            }
+            while (counter < popChute.Count)
+            {
+                //CHECK_TEARDOWN(15; 300; "water", "stuff")
+                foreach (Pop i in popChute[counter])
+                {
+                    tearDownPops.Add(i);
+                    Console.WriteLine("POP" + i);
+                }
+                counter++;
+            }
             popNames.Clear();
             popCosts.Clear();
             popLoads.Clear();
@@ -285,8 +308,8 @@ namespace seng301_asgn1
             }
             return new List<IList>() {
                 new List<Coin>(phatStacks),
-                new List<Coin>(coinChute[0]),
-                new List<Pop>(popChute[0]) };
+                new List<Coin>(tearDownCoins),
+                new List<Pop>(tearDownPops) };
         }
     }
 }
